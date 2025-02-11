@@ -1,9 +1,8 @@
 <template>
-  <!--  <nav>-->
-  <!--    <router-link to="/login">Home</router-link> |-->
-  <!--    <router-link to="/about">About</router-link>-->
-  <!--  </nav>-->
-  <router-view/>
+  <div id="app">
+    <router-link to="/"></router-link>
+    <router-view/>
+  </div>
 </template>
 
 <style lang="scss">
