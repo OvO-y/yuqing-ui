@@ -2,45 +2,7 @@
   <div class="common-layout">
     <el-container>
       <el-aside :width="isCollapse ? '64px' : '200px'">
-        <!--        <el-col>-->
-        <!--          <h3 class="menu-title">网络情报分析系统</h3>-->
-        <!--          &lt;!&ndash;        <h1 class="mb-2">网络情报分析系统</h1>&ndash;&gt;-->
-        <!--          <el-menu-->
-        <!--            default-active="2"-->
-        <!--            background-color=rgb(65,71,85)-->
-        <!--            class="el-menu-vertical-demo"-->
-        <!--            text-color="#fff"-->
-        <!--            :collapse="isCollapse"-->
-
-        <!--            @open="handleOpen"-->
-        <!--            @close="handleClose"-->
-        <!--          >-->
-        <!--            <el-menu-item index="1">-->
-        <!--              <el-icon>-->
-        <!--                <DocumentAdd/>-->
-        <!--              </el-icon>-->
-        <!--              <template #title>新建舆情监测</template>-->
-        <!--            </el-menu-item>-->
-        <!--            <el-sub-menu index="2">-->
-        <!--              <template #title>-->
-        <!--                <el-icon>-->
-        <!--                  <VideoPlay/>-->
-        <!--                </el-icon>-->
-        <!--                <span>舆情监测</span>-->
-        <!--              </template>-->
-        <!--              <el-menu-item-group>-->
-        <!--                &lt;!&ndash;              <template #title>&ndash;&gt;-->
-        <!--                &lt;!&ndash;                <span>检测分析</span>&ndash;&gt;-->
-        <!--                &lt;!&ndash;              </template>&ndash;&gt;-->
-        <!--                <el-menu-item index="2-1">检测分析</el-menu-item>-->
-        <!--                <el-menu-item index="2-2">数据监测</el-menu-item>-->
-        <!--                <el-menu-item index="2-3">检测管理</el-menu-item>-->
-        <!--              </el-menu-item-group>-->
-        <!--            </el-sub-menu>-->
-        <!--            &lt;!&ndash; 菜单项 &ndash;&gt;-->
-        <!--          </el-menu>-->
-        <!--        </el-col>-->
-        <MenuElement></MenuElement>
+        <menu-element></menu-element>
       </el-aside>
       <el-container>
         <el-header>
@@ -53,46 +15,7 @@
                 <Expand/>
               </el-icon>
             </div>
-            <el-tabs v-model="activeTab" type="border-card" @tab-click="handleTabClick">
-              <el-tab-pane>
-              </el-tab-pane>
-              <el-tab-pane name="todayHotspots" label="今日热点">
-                <template #label>
-                  <span class="tab-label"><el-icon><List/></el-icon>今日热点</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="monitorAnalysis" label="监测分析">
-                <template #label>
-                  <span class="tab-label"><el-icon><Aim/></el-icon>监测分析</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="dataMonitoring" label="数据监测">
-                <template #label>
-                  <span class="tab-label"><el-icon><Histogram/></el-icon> 数据监测</span>
-                </template>
-                数据监测
-              </el-tab-pane>
-              <el-tab-pane name="monitorManagement" label="监测管理">
-                <template #label>
-                  <span class="tab-label"><el-icon><Operation/></el-icon>监测管理</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="fullTextSearch" label="全文搜索">
-                <template #label>
-                  <span class="tab-label"><el-icon><Search/></el-icon> 全文搜索</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="eventAnalysis" label="事件分析">
-                <template #label>
-                  <span class="tab-label"><el-icon><FolderRemove/></el-icon>事件分析</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="monitorScreen" label="监测大屏">
-                <template #label>
-                  <span class="tab-label"><el-icon><TrendCharts/></el-icon>监测大屏</span>
-                </template>
-              </el-tab-pane>
-            </el-tabs>
+            <navigation-element :activeIndex="activeIndex"></navigation-element>
             <el-icon class="right-icon" @click="jumpSetting">
               <Setting/>
             </el-icon>
@@ -107,30 +30,28 @@
 </template>
 
 <script setup>
-import { ref, provide } from 'vue'
-import { useRouter } from 'vue-router'
+import { provide, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import MenuElement from '@/views/components/MenuElement.vue'
+import NavigationElement from '@/views/components/NavigationElement.vue'
 
 const router = useRouter()
-const activeTab = ref('dataMonitoring')
-const isCollapse = ref(false) // 侧边栏折叠状态
-
-const handleTabClick = (tab) => {
-  const routeMap = {
-    todayHotspots: '/hotSpot',
-    monitorAnalysis: '/monitor-analysis',
-    dataMonitoring: '/data-monitor',
-    monitorManagement: '/monitor-manage',
-    fullTextSearch: '/fullText-search',
-    eventAnalysis: '/event-analysis',
-    monitorScreen: '/monitor-screen'
+const route = useRoute()
+// 导肮栏监听路由变化来更新 activeIndex
+const activeIndex = ref('/data-monitor')
+watch(
+  () => route.path,
+  (newPath) => {
+    activeIndex.value = newPath
   }
-
-  router.push(routeMap[tab.props.name])
-}
+)
+const isCollapse = ref(false) // 侧边栏折叠状态
 provide('isCollapse', isCollapse)
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
+}
+function jumpSetting () {
+  router.push({ path: '/user-editor' })
 }
 </script>
 
@@ -174,12 +95,6 @@ const toggleCollapse = () => {
 .el-header {
   padding: 0 !important;
   margin: 0 !important;
-}
-
-.tab-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .header-container {

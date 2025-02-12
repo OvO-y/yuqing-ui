@@ -5,53 +5,57 @@
         <div class="header-container">
           <!-- Tab bar -->
           <div class="toggle-button">
-<!--            <el-icon v-if="!isCollapse">-->
-<!--              <Fold/>-->
-<!--            </el-icon>-->
+            <!--            <el-icon v-if="!isCollapse">-->
+            <!--              <Fold/>-->
+            <!--            </el-icon>-->
             <el-icon>
               <Expand/>
             </el-icon>
           </div>
-          <el-tabs v-model="activeTab" type="border-card" @tab-click="handleTabClick">
-            <el-tab-pane></el-tab-pane>
-            <el-tab-pane name="todayHotspots" label="今日热点">
-              <template #label>
-                <span class="tab-label"><el-icon><List/></el-icon>今日热点</span>
-              </template>
-              今日热点
-            </el-tab-pane>
-            <el-tab-pane name="monitorAnalysis" label="监测分析">
-              <template #label>
-                <span class="tab-label"><el-icon><Aim/></el-icon>监测分析</span>
-              </template>
-            </el-tab-pane>
-            <el-tab-pane name="dataMonitoring" label="数据监测">
-              <template #label>
-                <span class="tab-label"><el-icon><Histogram/></el-icon> 数据监测</span>
-              </template>
-            </el-tab-pane>
-            <el-tab-pane name="monitorManagement" label="监测管理">
-              <template #label>
-                <span class="tab-label"><el-icon><Operation/></el-icon>监测管理</span>
-              </template>
-            </el-tab-pane>
-            <el-tab-pane name="fullTextSearch" label="全文搜索">
-              <template #label>
-                <span class="tab-label"><el-icon><Search/></el-icon> 全文搜索</span>
-              </template>
-            </el-tab-pane>
-            <el-tab-pane name="eventAnalysis" label="事件分析">
-              <template #label>
-                <span class="tab-label"><el-icon><FolderRemove/></el-icon>事件分析</span>
-              </template>
-            </el-tab-pane>
-            <el-tab-pane name="monitorScreen" label="监测大屏">
-              <template #label>
-                <span class="tab-label"><el-icon><TrendCharts/></el-icon>监测大屏</span>
-              </template>
-            </el-tab-pane>
-          </el-tabs>
-          <el-icon class="right-icon">
+          <!--          <el-tabs v-model="activeTab" type="border-card" @tab-click="handleTabClick">-->
+          <!--            <el-tab-pane></el-tab-pane>-->
+          <!--            <el-tab-pane name="todayHotspots" label="今日热点">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><List/></el-icon>今日热点</span>-->
+          <!--              </template>-->
+          <!--              今日热点-->
+          <!--            </el-tab-pane>-->
+          <!--            <el-tab-pane name="monitorAnalysis" label="监测分析">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><Aim/></el-icon>监测分析</span>-->
+          <!--              </template>-->
+          <!--            </el-tab-pane>-->
+          <!--            <el-tab-pane name="dataMonitoring" label="数据监测">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><Histogram/></el-icon> 数据监测</span>-->
+          <!--              </template>-->
+          <!--            </el-tab-pane>-->
+          <!--            <el-tab-pane name="monitorManagement" label="监测管理">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><Operation/></el-icon>监测管理</span>-->
+          <!--              </template>-->
+          <!--            </el-tab-pane>-->
+          <!--            <el-tab-pane name="fullTextSearch" label="全文搜索">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><Search/></el-icon> 全文搜索</span>-->
+          <!--              </template>-->
+          <!--            </el-tab-pane>-->
+          <!--            <el-tab-pane name="eventAnalysis" label="事件分析">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><FolderRemove/></el-icon>事件分析</span>-->
+          <!--              </template>-->
+          <!--            </el-tab-pane>-->
+          <!--            <el-tab-pane name="monitorScreen" label="监测大屏">-->
+          <!--              <template #label>-->
+          <!--                <span class="tab-label"><el-icon><TrendCharts/></el-icon>监测大屏</span>-->
+          <!--              </template>-->
+          <!--            </el-tab-pane>-->
+          <!--          </el-tabs>-->
+          <!--          <el-icon class="right-icon">-->
+          <!--            <Setting/>-->
+          <!--          </el-icon>-->
+          <navigation-element :activeIndex="activeIndex"></navigation-element>
+          <el-icon class="right-icon" @click="jumpSetting">
             <Setting/>
           </el-icon>
         </div>
@@ -64,25 +68,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+// import { ref } from 'vue'
+// import { useRouter } from 'vue-router'
+//
+// const router = useRouter()
+// const activeTab = ref('todayHotspots')
+//
+// // Method to handle tab click events
+// const handleTabClick = (tab) => {
+//   const routeMap = {
+//     todayHotspots: '/hotSpot',
+//     monitorAnalysis: '/monitor-analysis',
+//     dataMonitoring: '/data-monitor',
+//     monitorManagement: '/monitor-manage',
+//     fullTextSearch: '/fullText-search',
+//     eventAnalysis: '/event-analysis',
+//     monitorScreen: '/monitor-screen'
+//   }
+//
+//   router.push(routeMap[tab.props.name])
+// }
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import NavigationElement from '@/views/components/NavigationElement.vue'
 
 const router = useRouter()
-const activeTab = ref('todayHotspots')
-
-// Method to handle tab click events
-const handleTabClick = (tab) => {
-  const routeMap = {
-    todayHotspots: '/hotSpot',
-    monitorAnalysis: '/monitor-analysis',
-    dataMonitoring: '/data-monitor',
-    monitorManagement: '/monitor-manage',
-    fullTextSearch: '/fullText-search',
-    eventAnalysis: '/event-analysis',
-    monitorScreen: '/monitor-screen'
+const route = useRoute()
+// 导肮栏监听路由变化来更新 activeIndex
+const activeIndex = ref('/hotSpot')
+watch(
+  () => route.path,
+  (newPath) => {
+    activeIndex.value = newPath
   }
-
-  router.push(routeMap[tab.props.name])
+)
+function jumpSetting () {
+  router.push({ path: '/user-editor' })
 }
 </script>
 
@@ -121,6 +142,7 @@ const handleTabClick = (tab) => {
   position: absolute;
   top: 12px;
   right: 20px;
+  cursor: pointer;
 }
 .toggle-button {
   display: flex;

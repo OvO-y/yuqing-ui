@@ -1,60 +1,9 @@
-<script setup>
-</script>
-
 <template>
   <div class="common-layout">
     <el-container>
       <el-aside :width="isCollapse ? '64px' : '200px'">
-        <el-col>
-          <h3 class="menu-title">网络情报分析系统</h3>
-          <!--        <h1 class="mb-2">网络情报分析系统</h1>-->
-          <el-menu
-            default-active="2"
-            background-color=rgb(65,71,85)
-            class="el-menu-vertical-demo"
-            text-color="#fff"
-            :collapse="isCollapse"
-            @open="handleOpen"
-            @close="handleClose"
-          >
-
-            <el-sub-menu index="1">
-              <template #title>
-                <el-icon>
-                  <VideoPlay/>
-                </el-icon>
-                <span>预警设置</span>
-              </template>
-              <el-menu-item-group>
-                <!--              <template #title>-->
-                <!--                <span>检测分析</span>-->
-                <!--              </template>-->
-                <el-menu-item index="1-1">配置列表</el-menu-item>
-                <el-menu-item index="1-2">消息列表</el-menu-item>
-              </el-menu-item-group>
-            </el-sub-menu>
-            <el-menu-item index="2">
-              <el-icon>
-                <DocumentAdd/>
-              </el-icon>
-              <template #title>偏好设置</template>
-            </el-menu-item>
-            <el-menu-item index="3">
-              <el-icon>
-                <DocumentAdd/>
-              </el-icon>
-              <template #title>收藏夹</template>
-            </el-menu-item>
-            <el-menu-item index="4">
-              <el-icon>
-                <DocumentAdd/>
-              </el-icon>
-              <template #title>账号管理</template>
-            </el-menu-item>
-            <!-- 菜单项 -->
-          </el-menu>
-        </el-col>
-        <MenuElement></MenuElement>
+        <!--        <menu-element></menu-element>-->
+        <editor-navigation></editor-navigation>
       </el-aside>
       <el-container>
         <el-header>
@@ -67,59 +16,132 @@
                 <Expand/>
               </el-icon>
             </div>
-            <el-tabs v-model="activeTab" type="border-card" @tab-click="handleTabClick">
-              <el-tab-pane>
-              </el-tab-pane>
-              <el-tab-pane name="todayHotspots" label="今日热点">
-                <template #label>
-                  <span class="tab-label"><el-icon><List/></el-icon>今日热点</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="monitorAnalysis" label="监测分析">
-                <template #label>
-                  <span class="tab-label"><el-icon><Aim/></el-icon>监测分析</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="dataMonitoring" label="数据监测">
-                <template #label>
-                  <span class="tab-label"><el-icon><Histogram/></el-icon> 数据监测</span>
-                </template>
-                数据监测
-              </el-tab-pane>
-              <el-tab-pane name="monitorManagement" label="监测管理">
-                <template #label>
-                  <span class="tab-label"><el-icon><Operation/></el-icon>监测管理</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="fullTextSearch" label="全文搜索">
-                <template #label>
-                  <span class="tab-label"><el-icon><Search/></el-icon> 全文搜索</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="eventAnalysis" label="事件分析">
-                <template #label>
-                  <span class="tab-label"><el-icon><FolderRemove/></el-icon>事件分析</span>
-                </template>
-              </el-tab-pane>
-              <el-tab-pane name="monitorScreen" label="监测大屏">
-                <template #label>
-                  <span class="tab-label"><el-icon><TrendCharts/></el-icon>监测大屏</span>
-                </template>
-              </el-tab-pane>
-            </el-tabs>
-            <el-icon class="right-icon">
+            <navigation-element :activeIndex="activeIndex"></navigation-element>
+            <el-icon class="right-icon" @click="jumpSetting">
               <Setting/>
             </el-icon>
           </div>
         </el-header>
         <el-main>
-          <router-view></router-view>
+          <div class="mainContent">
+            <p class="naviSet">系统设置&nbsp;>&nbsp;账号管理</p>
+            <div class="account">
+              <el-table :data="tableData" style="width: 100%">
+                <el-table-column prop="userName" label="用户名"/>
+                <!--                <el-table-column prop="companyName" label="公司名称" width="180"/>-->
+                <el-table-column prop="email" label="邮箱地址" width="200"/>
+                <el-table-column prop="userStatus" label="用户状态"/>
+                <!--                <el-table-column prop="loginTime" label="登录次数"/>-->
+                <el-table-column prop="recentLogin" label="最近一次登录" width="200"/>
+                <el-table-column prop="operation" label="操作"/>
+              </el-table>
+            </div>
+          </div>
+
+          <!--          <router-view></router-view>-->
         </el-main>
       </el-container>
     </el-container>
   </div>
 </template>
 
-<style scoped lang="scss">
+<script setup>
+import { provide, ref } from 'vue'
+// import MenuElement from '@/views/components/MenuElement.vue'
+import NavigationElement from '@/views/components/NavigationElement.vue'
+import EditorNavigation from '@/views/components/EditorNavigation.vue'
 
+const isCollapse = ref(false) // 侧边栏折叠状态
+provide('isCollapse', isCollapse)
+const toggleCollapse = () => {
+  isCollapse.value = !isCollapse.value
+}
+const tableData = [
+  {
+    userName: 'y',
+    // companyName: 'y',
+    email: '33@qq.com',
+    userStatus: '正常',
+    // loginTime: '18',
+    recentLogin: '2025-2-12 05:30:21'
+  }
+]
+</script>
+
+<style scoped lang="scss">
+.common-layout {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.el-container {
+  height: 100%;
+}
+
+.el-aside {
+  background: rgb(65, 71, 85);
+  height: 100%;
+  transition: width 0.3s ease; /* 动画效果 */
+}
+
+.toggle-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 20px;
+  margin-right: 20px;
+  position: relative;
+  top: 21px;
+  left: -5px;
+  height: 0;
+  width: 30px;
+  z-index: 999;
+  padding-left: 5px;
+}
+
+.toggle-button .el-icon {
+  padding: 10px 11px 10px 10px;
+}
+
+.el-header {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.header-container {
+  position: relative;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100%;
+  height: 100%;
+}
+
+.right-icon {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  cursor: pointer;
+}
+
+.el-main {
+  padding: 0;
+  height: 100%;
+}
+
+.mainContent {
+  background-color: rgb(238, 245, 249);
+  height: 100%;
+}
+
+.naviSet {
+  font-size: 12px;
+  float: left;
+  margin: 15px;
+}
+
+.account {
+  margin: 0 20px;
+}
 </style>
