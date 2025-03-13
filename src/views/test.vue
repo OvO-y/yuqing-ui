@@ -9,12 +9,12 @@
   >
     <el-form-item label="账号名称" prop="name" label-width="100px" label-position="left" style="font-size: 18px">
       <el-input style="height: 35px;" v-model="ruleForm.name" placeholder="请输入账号名称" prefix-icon="User"
-                autocomplete="off" />
+                autocomplete="off"/>
     </el-form-item>
-    <el-form-item label="手机号码" prop="phone"  label-width="100px" label-position="left" class="el-input">
+    <el-form-item label="手机号码" prop="phone" label-width="100px" label-position="left" class="el-input">
       <el-input v-model="ruleForm.phone" placeholder="请输入手机号码" clearable/>
     </el-form-item>
-    <el-form-item label="密码" prop="password"   label-width="100px" label-position="left">
+    <el-form-item label="密码" prop="password" label-width="100px" label-position="left">
       <el-input v-model="ruleForm.password"
                 style="width: 100%"
                 type="password"
@@ -22,7 +22,7 @@
                 show-password
       />
     </el-form-item>
-    <el-form-item label="确认密码"   prop="repassword"  label-width="100px" label-position="left">
+    <el-form-item label="确认密码" prop="repassword" label-width="100px" label-position="left">
       <el-input v-model="ruleForm.repassword"
                 style="width: 100%"
                 type="password"
@@ -40,12 +40,24 @@
       <el-button type="primary" class="registerBtn" @click="submitForm(ruleFormRef)">确定</el-button>
       <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
     </el-form-item>
+    <el-form-item>
+     <span>账号：{{store.getters.getUser.account}}</span>
+     <span>电话：{{store.getters.getUser.telephone}}</span>
+    </el-form-item>
   </el-form>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useStore } from 'vuex' // 新增store引入
 
+const store = useStore() // 新增store实例
+
+console.log(store.getters.account)
+console.log(store.getters.telephone)
+console.log(store.getters.getUser.telephone)
+console.log(store.getters.getUser.account)
+console.log(store.getters)
 // 定义一个引用，用于引用表单实例
 const ruleFormRef = ref(null)
 

@@ -17,11 +17,11 @@
     bottom: 49px;
     opacity: 0.4;
 }">
-          <img src="../assets/递增箭头.png" style="position: absolute;
-    width: 250px;
-    height: 300px;
-    right: 9px;
-    bottom: 15px;">
+          <!--          <img src="../assets/递增箭头.png" style="position: absolute;-->
+          <!--    width: 250px;-->
+          <!--    height: 300px;-->
+          <!--    right: 9px;-->
+          <!--    bottom: 15px;">-->
           <img src="../assets/球状线路.png" style="position: absolute;
     width: 250px;
     height: 250px;
@@ -32,7 +32,7 @@
       <div class="RightContainer">
         <div class="FormBox">
           <form id="RegisterForm" action="">
-            <h2 style="margin-bottom: 0;">账号注册</h2>
+            <h2 style="margin-bottom: 0;">用户注册</h2>
             <el-form
               ref="ruleFormRef"
               :model="ruleForm"
@@ -67,14 +67,31 @@
                             label-position="left" class="el-input">
                 <el-input v-model="ruleForm.phone" placeholder="请输入手机号码" prefix-icon="Cellphone" clearable/>
               </el-form-item>
-              <el-form-item label="邮箱" v-if="method === 'email'" prop="email" label-width="100px" label-position="left"
+              <el-form-item label="邮箱" v-if="method === 'email'" prop="email" label-width="100px"
+                            label-position="left"
                             class="el-input">
-                <el-input v-model="ruleForm.phone" placeholder="请输入邮箱" prefix-icon="Message" clearable/>
+                <el-input v-model="ruleForm.email" placeholder="请输入邮箱" prefix-icon="Message" clearable/>
               </el-form-item>
-              <el-form-item label="账号名称" prop="name" label-width="100px" label-position="left"
+
+              <el-form-item v-if="method === 'phone'" label="手机验证码" prop="validword" label-width="100px"
+                            label-position="left" style="font-size: 18px">
+                <el-input v-model="ruleForm.validword" prefix-icon="Key" placeholder="请输入内容">
+                  <template #append>
+                    <el-button>发送</el-button>
+                  </template>
+                </el-input>
+              </el-form-item>
+              <el-form-item v-if="method === 'email'" label="邮箱验证码" prop="validword" label-width="100px"
+                            label-position="left"
                             style="font-size: 18px">
-                <el-input style="height: 35px;" v-model="ruleForm.name" placeholder="请输入账号名称" prefix-icon="User"
-                          autocomplete="off"/>
+                <!--                <el-input style="height: 35px;" v-model="ruleForm.validword" placeholder="请输入邮箱验证码"-->
+                <!--                          prefix-icon="User"-->
+                <!--                          autocomplete="off"/>-->
+                <el-input v-model="ruleForm.validword" prefix-icon="Key" placeholder="请输入内容">
+                  <template #append>
+                    <el-button>发送</el-button>
+                  </template>
+                </el-input>
               </el-form-item>
               <el-form-item label="密码" prop="password" label-width="100px" label-position="left">
                 <el-input v-model="ruleForm.password"
@@ -95,12 +112,12 @@
                 />
               </el-form-item>
               <el-form-item label="验证码" label-width="100px" label-position="left">
-                <el-input v-model="identifyMode" placeholder="请输入验证码" clearable/>
+                <el-input v-model="identifyMode" prefix-icon="Key" placeholder="请输入验证码" clearable/>
                 <div class="code" @click="refreshCode">
                   <SIdentify :identifyCode="identifyCode"></SIdentify>
                 </div>
               </el-form-item>
-              <el-form-item style="width: 100%;justify-content: space-between;}">
+              <el-form-item style="width: 100%;justify-content: space-between;">
                 <div style="width: 100%;display:flex;justify-content: space-between;
 }">
                   <el-button type="primary" class="registerBtn" @click="submitForm(ruleFormRef)">确定</el-button>
@@ -118,13 +135,19 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
 import SIdentify from '@/components/Sidentify'
+import { registerApi } from '@/api/lore'
+import { useStore } from 'vuex' // 新增store引入
+import { useRouter } from 'vue-router'
 
+const store = useStore() // 新增store实例
+
+const router = useRouter()
 // 获取路由器
 const identifyMode = ref('') // 输入框验证码
 const identifyCode = ref('') // 图形验证码
 const identifyCodes = ref('1234567890abcdefjhijklinopqrsduvwxyz') // 验证码出现的数字和字母
 const ruleForm = reactive({
-  name: '',
+  validword: '',
   phone: '',
   email: '',
   password: '',
@@ -133,16 +156,16 @@ const ruleForm = reactive({
 
 // 定义一个引用，用于引用表单实例
 const ruleFormRef = ref(null)
-const method = ref('phone')
+const method = ref('email')
 
 function changeMethod (me) {
   method.value = me
 }
 
 // 验证账号名称
-const validateName = function (rule, value, callback) {
+const validateValidword = function (rule, value, callback) {
   if (value === '') {
-    callback(new Error('Please input the name'))
+    callback(new Error('请输入验证码'))
   } else {
     console.log(value)
     callback()
@@ -150,41 +173,42 @@ const validateName = function (rule, value, callback) {
 }
 // 验证手机号的函数
 const validatePhone = function (rule, value, callback) {
+  // 检查是否为空
   if (!value) {
-    return callback(new Error('Please input the phone'))
+    return callback(new Error('请输入手机号'))
   }
+  // 检查是否为纯数字
+  if (!/^\d+$/.test(value)) {
+    return callback(new Error('请输入合法的手机号'))
+  }
+  // 检查电话号码长度（假设电话号码长度为11位，如中国的手机号码）
+  if (value.length !== 11) {
+    return callback(new Error('请输入合法有效的手机号'))
+  }
+  // 如果所有验证通过
   setTimeout(() => {
-    if (!Number.isInteger(value)) {
-      callback(new Error('Please input digits'))
-    } else {
-      if (value < 18) {
-        callback(new Error('Age must be greater than 18'))
-      } else {
-        callback()
-      }
-    }
+    callback()
   }, 1000)
 }
 // 验证邮箱的函数
 const validateEmail = function (rule, value, callback) {
   if (!value) {
-    return callback(new Error('Please input the email'))
+    return callback(new Error('请输入邮箱'))
   }
-  setTimeout(() => {
-    if (!/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
-      callback(new Error('Please input the right email'))
-    }
-  }, 1000)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    callback(new Error('请输入合法邮箱'))
+  } else {
+    callback() // 验证通过
+  }
 }
-
 // 验证密码的函数
 const validatePassword = function (rule, value, callback) {
   if (value === '') {
-    callback(new Error('Please input the password'))
+    callback(new Error('请输入密码'))
   } else {
-    if (ruleForm.repassword !== '') {
-      if (!ruleFormRef.value) return
-      ruleFormRef.value.validateField('repassword')
+    if (ruleForm.repassword !== '' && ruleFormRef.value) {
+      ruleFormRef.value.validateField('repassword', () => {
+      })
     }
     callback()
   }
@@ -193,9 +217,9 @@ const validatePassword = function (rule, value, callback) {
 // 再次验证密码的函数
 const validateRepassword = function (rule, value, callback) {
   if (value === '') {
-    callback(new Error('Please input the password again'))
+    callback(new Error('请确认密码'))
   } else if (value !== ruleForm.password) {
-    callback(new Error('Two inputs don\'t match!'))
+    callback(new Error('两次输入密码不一致'))
   } else {
     callback()
   }
@@ -203,8 +227,8 @@ const validateRepassword = function (rule, value, callback) {
 
 // 存储表单验证规则的响应式对象
 const rules = reactive({
-  name: [{
-    validator: validateName,
+  validword: [{
+    validator: validateValidword,
     trigger: 'blur'
   }],
   phone: [{
@@ -227,13 +251,47 @@ const rules = reactive({
 
 // 提交表单的函数
 const submitForm = function (formEl) {
-  if (!formEl) return
+  console.log(ruleForm.value)
+  console.log(formEl)
+  console.log(!formEl?.validate)
+  if (!formEl?.validate) {
+    console.error('表单实例未找到，当前表单引用：', ruleFormRef.value)
+    return
+  }
   formEl.validate((valid) => {
+    console.log('验证结果:', valid)
     if (valid) {
-      if (identifyCode.value !== identifyMode.value) {
-        alert('验证码错误')
-        return
+      // if (identifyCode.value !== identifyMode.value) {
+      //   alert('验证码错误')
+      //   return
+      // }
+      // 公共响应处理函数
+      const handleResponse = (res) => {
+        alert(res.resp)
+        // if (res.code === 200) alert('注册成功')
+        // localStorage.setItem('token', res.token)
+        if (res.resp.includes('successfully')) {
+          alert('注册成功')
+          store.dispatch('asyncUpdateUser', {
+            account: res.account,
+            telephone: res.telephone,
+            token: res.token
+          })
+          router.push({ name: 'test', query: { title: 'test' } })
+        }
       }
+
+      // 动态请求参数
+      const requestData = {
+        user: {
+          password: ruleForm.password,
+          [method.value === 'email' ? 'email' : 'telephone']:
+            method.value === 'email' ? ruleForm.email : ruleForm.phone
+        },
+        method: method.value
+      }
+      // 发送请求
+      registerApi(requestData).then(handleResponse)
       console.log('submit!')
     } else {
       console.log('error submit!')
@@ -281,6 +339,7 @@ const refreshCode = () => {
   width: 100%;
   background: linear-gradient(to right, #0048cf, #4ba1fa);
 }
+
 .AllContainer {
   height: 82%;
   width: 72%;
@@ -337,6 +396,7 @@ const refreshCode = () => {
   align-items: center;
   justify-content: center;
 }
+
 .BackImg img {
   /*width: 50%;*/
   /*height: 55%;*/
@@ -428,6 +488,10 @@ const refreshCode = () => {
 
 .el-form-item__content {
   justify-content: center;
+}
+
+.send-btn {
+  border: none;
 }
 
 .el-form--inline .el-form-item {
