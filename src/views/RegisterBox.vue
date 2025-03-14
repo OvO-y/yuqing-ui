@@ -205,11 +205,12 @@ const validateEmail = function (rule, value, callback) {
 const validatePassword = function (rule, value, callback) {
   if (value === '') {
     callback(new Error('请输入密码'))
+  }
+  // 使用正则表达式检查是否包含大小写字母和数字
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+  if (!passwordRegex.test(value)) {
+    callback(new Error('密码必须包含至少一个大写字母、一个小写字母和一个数字'))
   } else {
-    if (ruleForm.repassword !== '' && ruleFormRef.value) {
-      ruleFormRef.value.validateField('repassword', () => {
-      })
-    }
     callback()
   }
 }
@@ -261,10 +262,10 @@ const submitForm = function (formEl) {
   formEl.validate((valid) => {
     console.log('验证结果:', valid)
     if (valid) {
-      // if (identifyCode.value !== identifyMode.value) {
-      //   alert('验证码错误')
-      //   return
-      // }
+      if (identifyCode.value !== identifyMode.value) {
+        alert('验证码错误')
+        return
+      }
       // 公共响应处理函数
       const handleResponse = (res) => {
         alert(res.resp)
