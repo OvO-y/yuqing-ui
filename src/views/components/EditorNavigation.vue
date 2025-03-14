@@ -10,38 +10,38 @@
       :collapse="isCollapse"
       router
     >
-        <el-menu-item-group>
-          <el-sub-menu index="1">
-            <template #title>
-              <el-icon>
-                <Bell/>
-              </el-icon>
-              <span>预警设置</span>
-            </template>
-            <el-menu-item-group>
-              <el-menu-item index="/Waring">配置列表</el-menu-item>
-              <el-menu-item index="/waringMessage">消息列表</el-menu-item>
-            </el-menu-item-group>
-          </el-sub-menu>
-          <el-menu-item index="2">
+      <el-menu-item-group>
+        <el-sub-menu index="1">
+          <template #title>
             <el-icon>
-              <Filter/>
+              <Bell/>
             </el-icon>
-            <template #title>偏好设置</template>
-          </el-menu-item>
-          <el-menu-item index="3">
-            <el-icon>
-              <Star/>
-            </el-icon>
-            <template #title>收藏夹</template>
-          </el-menu-item>
-          <el-menu-item index="user-editor">
-            <el-icon>
-              <Avatar/>
-            </el-icon>
-            <template #title>账号管理</template>
-          </el-menu-item>
-        </el-menu-item-group>
+            <span>预警设置</span>
+          </template>
+          <el-menu-item-group>
+            <el-menu-item index="/Waring">配置列表</el-menu-item>
+            <el-menu-item index="/waringMessage">消息列表</el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
+        <el-menu-item index="/user-editor">
+          <el-icon>
+            <Filter/>
+          </el-icon>
+          <template #title>偏好设置</template>
+        </el-menu-item>
+        <el-menu-item index="/user-editor">
+          <el-icon>
+            <Star/>
+          </el-icon>
+          <template #title>收藏夹</template>
+        </el-menu-item>
+        <el-menu-item index="user-editor">
+          <el-icon>
+            <Avatar/>
+          </el-icon>
+          <template #title>账号管理</template>
+        </el-menu-item>
+      </el-menu-item-group>
       <!-- 菜单项 -->
     </el-menu>
   </el-col>

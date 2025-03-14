@@ -85,6 +85,7 @@ import NavigationElement from '@/views/components/NavigationElement.vue'
 import EditorNavigation from '@/views/components/EditorNavigation.vue'
 import request from '@/util/request'
 import {ElMessage} from 'element-plus'
+import store from "@/store";
 
 const isCollapse = ref(false) // 侧边栏折叠状态
 provide('isCollapse', isCollapse)
@@ -92,9 +93,10 @@ const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
 }
 const tableData = ref([]); // 初始化为空数组
-const account = this.$store.state.user.account
+git
 // const user = ref({});
 onMounted(() => {
+  console.log(account)
   console.log('获取用户数据')
   fetchUserInfo()
 })
@@ -191,7 +193,7 @@ const handleEdit = async () => {
 
     const response = await request.post('/changePassword', {
         // form
-        account: this.$store.state.user.account,
+        account: store.state.user.account,
         password: form.password,
         oldPassword: form.oldPassword
       }

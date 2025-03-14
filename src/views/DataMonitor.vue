@@ -7,15 +7,19 @@
       <el-container>
         <el-header>
           <div class="header-container">
-            <div class="toggle-button" @click="toggleCollapse">
-              <el-icon v-if="!isCollapse">
-                <Fold/>
-              </el-icon>
-              <el-icon v-else>
-                <Expand/>
-              </el-icon>
-            </div>
-            <navigation-element :activeIndex="activeIndex"></navigation-element>
+
+            <navigation-element :activeIndex="activeIndex">
+              <template #toggle-button>
+                <div class="toggle-button" @click="toggleCollapse">
+                  <el-icon v-if="!isCollapse">
+                    <Fold/>
+                  </el-icon>
+                  <el-icon v-else>
+                    <Expand/>
+                  </el-icon>
+                </div>
+              </template>
+            </navigation-element>
             <el-icon class="right-icon" @click="jumpSetting">
               <Setting/>
             </el-icon>
@@ -50,6 +54,7 @@ provide('isCollapse', isCollapse)
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
 }
+
 function jumpSetting () {
   router.push({ path: '/user-editor' })
 }
@@ -89,7 +94,8 @@ function jumpSetting () {
 }
 
 .toggle-button .el-icon {
-  padding: 10px 11px 10px 10px;
+  //padding: 10px 11px 10px 10px;
+  padding: 28px 10px 10px 20px
 }
 
 .el-header {
@@ -107,7 +113,7 @@ function jumpSetting () {
 
 .right-icon {
   position: absolute;
-  top: 12px;
+  top: 22px;
   right: 20px;
   cursor: pointer;
 }

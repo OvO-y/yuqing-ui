@@ -12,49 +12,16 @@
               <Expand/>
             </el-icon>
           </div>
-          <!--          <el-tabs v-model="activeTab" type="border-card" @tab-click="handleTabClick">-->
-          <!--            <el-tab-pane></el-tab-pane>-->
-          <!--            <el-tab-pane name="todayHotspots" label="今日热点">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><List/></el-icon>今日热点</span>-->
-          <!--              </template>-->
-          <!--              今日热点-->
-          <!--            </el-tab-pane>-->
-          <!--            <el-tab-pane name="monitorAnalysis" label="监测分析">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><Aim/></el-icon>监测分析</span>-->
-          <!--              </template>-->
-          <!--            </el-tab-pane>-->
-          <!--            <el-tab-pane name="dataMonitoring" label="数据监测">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><Histogram/></el-icon> 数据监测</span>-->
-          <!--              </template>-->
-          <!--            </el-tab-pane>-->
-          <!--            <el-tab-pane name="monitorManagement" label="监测管理">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><Operation/></el-icon>监测管理</span>-->
-          <!--              </template>-->
-          <!--            </el-tab-pane>-->
-          <!--            <el-tab-pane name="fullTextSearch" label="全文搜索">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><Search/></el-icon> 全文搜索</span>-->
-          <!--              </template>-->
-          <!--            </el-tab-pane>-->
-          <!--            <el-tab-pane name="eventAnalysis" label="事件分析">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><FolderRemove/></el-icon>事件分析</span>-->
-          <!--              </template>-->
-          <!--            </el-tab-pane>-->
-          <!--            <el-tab-pane name="monitorScreen" label="监测大屏">-->
-          <!--              <template #label>-->
-          <!--                <span class="tab-label"><el-icon><TrendCharts/></el-icon>监测大屏</span>-->
-          <!--              </template>-->
-          <!--            </el-tab-pane>-->
-          <!--          </el-tabs>-->
-          <!--          <el-icon class="right-icon">-->
-          <!--            <Setting/>-->
-          <!--          </el-icon>-->
-          <navigation-element :activeIndex="activeIndex"></navigation-element>
+
+          <navigation-element :activeIndex="activeIndex">
+            <template #toggle-button>
+              <div class="toggle-button" @click="toggleCollapse">
+                <el-icon>
+                  <Expand/>
+                </el-icon>
+              </div>
+            </template>
+          </navigation-element>
           <el-icon class="right-icon" @click="jumpSetting">
             <Setting/>
           </el-icon>
@@ -158,8 +125,9 @@ function jumpSetting () {
   z-index: 999;
   padding-left: 5px;
 }
-.toggle-button .el-icon{
-  padding: 10px 11px 10px 10px;
+.toggle-button .el-icon {
+  //padding: 10px 11px 10px 10px;
+  padding: 28px 10px 10px 20px
 }
 
 .header-container {
