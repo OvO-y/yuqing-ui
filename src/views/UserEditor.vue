@@ -8,15 +8,19 @@
       <el-container>
         <el-header>
           <div class="header-container">
-            <div class="toggle-button" @click="toggleCollapse">
-              <el-icon v-if="!isCollapse">
-                <Fold/>
-              </el-icon>
-              <el-icon v-else>
-                <Expand/>
-              </el-icon>
-            </div>
-            <navigation-element :activeIndex="activeIndex"></navigation-element>
+
+            <navigation-element :activeIndex="activeIndex">
+              <template #toggle-button>
+                <div class="toggle-button" @click="toggleCollapse">
+                  <el-icon v-if="!isCollapse">
+                    <Fold/>
+                  </el-icon>
+                  <el-icon v-else>
+                    <Expand/>
+                  </el-icon>
+                </div>
+              </template>
+            </navigation-element>
             <el-icon class="right-icon" @click="jumpSetting">
               <Setting/>
             </el-icon>
@@ -27,17 +31,46 @@
             <p class="naviSet">系统设置&nbsp;>&nbsp;账号管理</p>
             <div class="account">
               <el-table :data="tableData" style="width: 100%">
-                <el-table-column prop="userName" label="用户名"/>
+                <el-table-column prop="account" label="用户名"/>
                 <!--                <el-table-column prop="companyName" label="公司名称" width="180"/>-->
                 <el-table-column prop="email" label="邮箱地址" width="200"/>
                 <el-table-column prop="userStatus" label="用户状态"/>
                 <!--                <el-table-column prop="loginTime" label="登录次数"/>-->
                 <el-table-column prop="recentLogin" label="最近一次登录" width="200"/>
-                <el-table-column prop="operation" label="操作"/>
+                <el-table-column prop="operation" label="操作">
+                  <template #default="scope">
+                    <!--                    <el-button type="text" @click="handleEdit(scope.row)">-->
+                    <el-button type="text" @click="dialogFormVisible = true">
+                      <el-icon>
+                        <Edit/>
+                      </el-icon>
+                    </el-button>
+                  </template>
+                </el-table-column>
               </el-table>
+              <el-dialog v-model="dialogFormVisible" title="个人信息编辑" width="500">
+                <el-form :model="form" :rules="ruleForm" ref="formRef">
+                  <el-form-item label="原密码：" prop="oldPassword" :label-width="formLabelWidth">
+                    <el-input v-model="form.oldPassword" autocomplete="off"/>
+                  </el-form-item>
+                  <el-form-item label="新密码：" prop="password" :label-width="formLabelWidth">
+                    <el-input v-model="form.password" autocomple te="off"/>
+                  </el-form-item>
+                  <el-form-item label="再次确认密码：" prop="passwordConfirm" :label-width="formLabelWidth">
+                    <el-input v-model="form.passwordConfirm" autocomplete="off"/>
+                  </el-form-item>
+                </el-form>
+                <template #footer>
+                  <div class="dialog-footer">
+                    <el-button @click="dialogFormVisible = false">取消</el-button>
+                    <el-button type="primary" @click="dialogFormVisible= false;handleEdit()">
+                      确认
+                    </el-button>
+                  </div>
+                </template>
+              </el-dialog>
             </div>
           </div>
-
           <!--          <router-view></router-view>-->
         </el-main>
       </el-container>
@@ -46,26 +79,147 @@
 </template>
 
 <script setup>
-import { provide, ref } from 'vue'
+import {onMounted, provide, reactive, ref, userStore} from 'vue'
 // import MenuElement from '@/views/components/MenuElement.vue'
 import NavigationElement from '@/views/components/NavigationElement.vue'
 import EditorNavigation from '@/views/components/EditorNavigation.vue'
+import request from '@/util/request'
+import {ElMessage} from 'element-plus'
 
 const isCollapse = ref(false) // 侧边栏折叠状态
 provide('isCollapse', isCollapse)
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
 }
-const tableData = [
-  {
-    userName: 'y',
-    // companyName: 'y',
-    email: '33@qq.com',
-    userStatus: '正常',
-    // loginTime: '18',
-    recentLogin: '2025-2-12 05:30:21'
+const tableData = ref([]); // 初始化为空数组
+const account = this.$store.state.user.account
+// const user = ref({});
+onMounted(() => {
+  console.log('获取用户数据')
+  fetchUserInfo()
+})
+// const store = userStore();
+//读取账号
+// const account =store.account;
+const fetchUserInfo = async () => {
+  try {
+    const response = await request.post('/showAccount', {
+      account
+    })
+    console.log('响应内容：', response)
+    if (response && response.code === '0') {
+      console.log(tableData)
+      // tableData.splice(0, tableData.length,
+      //   ...response.data
+      // )
+      //   tableData.value = response.data;
+      tableData.value = Array.isArray(response.data) ? response.data : [response.data];
+    }
+  } catch (error) {
+    console.error('Failed to fetch user information:', error)
   }
-]
+}
+
+//编辑
+const dialogFormVisible = ref(false)
+const formLabelWidth = '140px'
+const form = reactive({
+  account: '',
+  password: '',
+  oldPassword: '',
+  passwordConfirm: ''
+})
+//校验两次密码输入是否一致
+const validatePass = (rule, value, callback) => {
+  if (value !== form.password) {
+    callback(new Error('两次输入的密码不一致!'))
+  } else {
+    callback()
+  }
+}
+const ruleForm = reactive({
+  password: [
+    {
+      required: true,
+      message: '请输入新密码',
+      trigger: 'blur'
+    },
+    {
+      min: 6,
+      max: 16,
+      message: '长度在 6 到 16 个字符',
+      trigger: 'blur'
+    }
+  ],
+  oldPassword: [
+    {
+      required: true,
+      message: '请输入原密码',
+      trigger: 'blur'
+    },
+    {
+      min: 6,
+      max: 16,
+      message: '长度在 6 到 16 个字符',
+      trigger: 'blur'
+    }],
+  passwordConfirm: [
+    {
+      required: true,
+      message: '请再次确认密码',
+      trigger: 'blur'
+    },
+    {
+      min: 6,
+      max: 16,
+      message: '长度在 6 到 16 个字符',
+      trigger: 'blur'
+    },
+    {
+      validator: validatePass,
+      trigger: 'blur'
+    }
+  ]
+})
+const formRef = ref(null)
+
+//修改密码
+const handleEdit = async () => {
+  console.log(form)
+  console.log("开始修改密码")
+  try {
+
+    const response = await request.post('/changePassword', {
+        // form
+        account: this.$store.state.user.account,
+        password: form.password,
+        oldPassword: form.oldPassword
+      }
+    )
+    console.log(response)
+    //返回信息提示
+    if (response && response.code === '0') {
+      ElMessage({
+        message: '成功修改密码',
+        type: 'success',
+      });
+      console.log("成功")
+    }
+    if (response && response.code === '-1' && response.message === "原密码错误，请重新输入") {
+      ElMessage({
+        message: '原密码错误，请重新输入',
+        type: 'warning',
+      });
+      console.log("密码错误")
+    }
+  } catch (error) {
+    ElMessage.error("请求失败")
+    console.error('Failed to fetch user information:', error)
+  }
+
+}
+
+
 </script>
 
 <style scoped lang="scss">
@@ -102,7 +256,8 @@ const tableData = [
 }
 
 .toggle-button .el-icon {
-  padding: 10px 11px 10px 10px;
+  //padding: 10px 11px 10px 10px;
+  padding: 28px 10px 10px 20px
 }
 
 .el-header {
@@ -120,7 +275,7 @@ const tableData = [
 
 .right-icon {
   position: absolute;
-  top: 12px;
+  top: 22px;
   right: 20px;
   cursor: pointer;
 }
