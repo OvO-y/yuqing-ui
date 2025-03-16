@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    user: {
+    user: JSON.parse(localStorage.getItem('user')) ||{
       account: '',
       telephone: '',
       token: ''
@@ -17,6 +17,7 @@ export default createStore({
   mutations: {
     updateUser (state, user) {
       state.user = user
+      localStorage.setItem('user', JSON.stringify(user)); // 将用户信息保存到 localStorage
     }
   },
   // 异步调用mutations

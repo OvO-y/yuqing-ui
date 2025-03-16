@@ -201,7 +201,8 @@ const Login = async function (formEl) {
           localStorage.setItem('token', res.token)
           store.dispatch('asyncUpdateUser', {
             account: res.account,
-            telephone: res.telephone
+            telephone: res.telephone,
+            token:res.token
           })
           router.push({
             name: 'hotSpot',

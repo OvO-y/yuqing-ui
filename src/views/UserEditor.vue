@@ -62,8 +62,8 @@
                 </el-form>
                 <template #footer>
                   <div class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取消</el-button>
-                    <el-button type="primary" @click="dialogFormVisible= false;handleEdit()">
+                    <el-button @click="resetForm">取消</el-button>
+                    <el-button type="primary" @click="submitForm()">
                       确认
                     </el-button>
                   </div>
@@ -94,16 +94,13 @@ const toggleCollapse = () => {
 }
 const tableData = ref([]); // 初始化为空数组
 const account = computed(() => store.state.user?.account || '未登录')
-
-// 可选：在组件加载时检查用户是否存在
-if (!store.state.user) {
-  // 如果未登录，可以跳转到登录页
-  router.push('/');
-}
 // const user = ref({});
 onMounted(() => {
   console.log('获取用户数据')
   console.log(account)
+  if (!store.state.user.account) { // 如果用户未登录，重定向至登录页
+    router.push('/login'); // 假设登录路由名为 '/login'
+  }
   fetchUserInfo()
 })
 // const store = userStore();
@@ -112,7 +109,7 @@ onMounted(() => {
 const fetchUserInfo = async () => {
   const currentAccount = account.value
   try {
-    const response = await postRequestForUser.post('/showAccount', {
+    const response = await postRequestForUser('/showAccount', {
       account:currentAccount
     })
     console.log('响应内容：', response)
@@ -138,6 +135,16 @@ const form = reactive({
   oldPassword: '',
   passwordConfirm: ''
 })
+//校验密码规则
+const validatePasswordComplexity = (rule, value, callback) => {
+  // 密码必须包含至少6个字符，一个大写字母、一个小写字母和一个数字
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+  if (!passwordRegex.test(value)) {
+    return callback(new Error('密码必须至少6个字符，包含数字、大小写字母'))
+  } else {
+    callback();
+  }
+};
 //校验两次密码输入是否一致
 const validatePass = (rule, value, callback) => {
   if (value !== form.password) {
@@ -154,11 +161,9 @@ const ruleForm = reactive({
       trigger: 'blur'
     },
     {
-      min: 6,
-      max: 16,
-      message: '长度在 6 到 16 个字符',
+      validator: validatePasswordComplexity, // 添加自定义的密码复杂度验证
       trigger: 'blur'
-    }
+    },
   ],
   oldPassword: [
     {
@@ -167,9 +172,7 @@ const ruleForm = reactive({
       trigger: 'blur'
     },
     {
-      min: 6,
-      max: 16,
-      message: '长度在 6 到 16 个字符',
+      validator: validatePasswordComplexity, // 添加自定义的密码复杂度验证
       trigger: 'blur'
     }],
   passwordConfirm: [
@@ -190,15 +193,22 @@ const ruleForm = reactive({
     }
   ]
 })
-const formRef = ref(null)
 
+const formRef = ref(null)
+//用于重置表单
+const resetForm = () => {
+  dialogFormVisible.value = false;
+  if (formRef.value) {
+    formRef.value.resetFields(); // 清除表单数据和验证结果
+  }
+};
 //修改密码
-const handleEdit = async () => {
+const submitForm = async () => {
   console.log(form)
   console.log("开始修改密码")
   try {
 
-    const response = await postRequestForUser.post('/changePassword', {
+    const response = await postRequestForUser('/changePassword', {
         // form
         account: store.state.user.account,
         password: form.password,
@@ -212,18 +222,19 @@ const handleEdit = async () => {
         message: '成功修改密码',
         type: 'success',
       });
-      console.log("成功")
+      resetForm();
     }
     if (response && response.code === '-1' && response.message === "原密码错误，请重新输入") {
       ElMessage({
         message: '原密码错误，请重新输入',
         type: 'warning',
       });
-      console.log("密码错误")
+      resetForm();
     }
   } catch (error) {
     ElMessage.error("请求失败")
     console.error('Failed to fetch user information:', error)
+    resetForm();
   }
 
 }
