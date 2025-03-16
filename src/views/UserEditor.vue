@@ -79,11 +79,11 @@
 </template>
 
 <script setup>
-import {onMounted, provide, reactive, ref, userStore} from 'vue'
+import {computed, onMounted, provide, reactive, ref, userStore} from 'vue'
 // import MenuElement from '@/views/components/MenuElement.vue'
 import NavigationElement from '@/views/components/NavigationElement.vue'
 import EditorNavigation from '@/views/components/EditorNavigation.vue'
-import request from '@/util/request'
+import request, {postRequestForUser} from "@/request";
 import {ElMessage} from 'element-plus'
 import store from "@/store";
 
@@ -93,20 +93,27 @@ const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value
 }
 const tableData = ref([]); // 初始化为空数组
-git
+const account = computed(() => store.state.user?.account || '未登录')
+
+// 可选：在组件加载时检查用户是否存在
+if (!store.state.user) {
+  // 如果未登录，可以跳转到登录页
+  router.push('/');
+}
 // const user = ref({});
 onMounted(() => {
-  console.log(account)
   console.log('获取用户数据')
+  console.log(account)
   fetchUserInfo()
 })
 // const store = userStore();
 //读取账号
 // const account =store.account;
 const fetchUserInfo = async () => {
+  const currentAccount = account.value
   try {
-    const response = await request.post('/showAccount', {
-      account
+    const response = await postRequestForUser.post('/showAccount', {
+      account:currentAccount
     })
     console.log('响应内容：', response)
     if (response && response.code === '0') {
@@ -191,7 +198,7 @@ const handleEdit = async () => {
   console.log("开始修改密码")
   try {
 
-    const response = await request.post('/changePassword', {
+    const response = await postRequestForUser.post('/changePassword', {
         // form
         account: store.state.user.account,
         password: form.password,

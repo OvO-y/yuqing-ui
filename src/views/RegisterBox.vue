@@ -278,7 +278,7 @@ const submitForm = function (formEl) {
             telephone: res.telephone,
             token: res.token
           })
-          router.push({ name: 'test', query: { title: 'test' } })
+          router.push({ name: 'hotSpot', query: { title: 'test' } })
         }
       }
 

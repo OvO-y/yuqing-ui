@@ -204,7 +204,7 @@ const Login = async function (formEl) {
             telephone: res.telephone
           })
           router.push({
-            name: 'test',
+            name: 'hotSpot',
             query: { title: 'test' }
           })
         }

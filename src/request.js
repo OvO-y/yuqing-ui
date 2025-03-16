@@ -2,9 +2,7 @@
 import axios from 'axios'
 // 创建axios实例
 const request = axios.create({
-  baseURL: 'http://localhost:8084/api/admin',
-  // baseURL: "http://localhost:8081/admin",
-
+  baseURL: 'http://localhost:8005/user',
   timeout: 5000
 })
 const service = axios.create({
@@ -90,9 +88,15 @@ service.interceptors.response.use(
   }
 )
 
-// 封装 POST 请求方法
-export const postRequest = (url, data) => {
-  return service.post(url, data)
-}
-// export default request
+// 封装 POST 请求方法，区分不同的基础URL
+export const postRequestForUser = (url, data) => {
+  return request.post(url, data);
+};
+
+export const postRequestForService = (url, data) => {
+  return service.post(url, data);
+};
+
+// 导出所有必要的实例和方法
+export { request, service };
 export default service
