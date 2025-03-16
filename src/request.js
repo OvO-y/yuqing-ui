@@ -90,13 +90,13 @@ service.interceptors.response.use(
 
 // 封装 POST 请求方法，区分不同的基础URL
 export const postRequestForUser = (url, data) => {
-  return request.post(url, data);
-};
+  return request.post(url, data)
+}
 
 export const postRequestForService = (url, data) => {
-  return service.post(url, data);
-};
+  return service.post(url, data)
+}
 
 // 导出所有必要的实例和方法
-export { request, service };
+export { request, service }
 export default service

@@ -1,4 +1,4 @@
-import { service, postRequest } from '@/request.js'
+import { service, postRequestForService } from '@/request.js'
 
 // export function accounrtLogin( ) {
 //   return service({
@@ -6,20 +6,20 @@ import { service, postRequest } from '@/request.js'
 //   })
 // }
 export function test01 (data) {
-  return postRequest('/test01', data)
+  return postRequestForService('/test01', data)
 }
 
 export const loginApi = (data) => {
-  return postRequest('/api/login', data)
+  return postRequestForService('/api/login', data)
 }
 export const accountloginApi = (data) => {
-  return postRequest('/accountlogin', data)
+  return postRequestForService('/accountlogin', data)
 }
 export const phoneloginApi = (data) => {
-  return postRequest('/phonelogin', data)
+  return postRequestForService('/phonelogin', data)
 }
 export const registerApi = (data) => {
-  return postRequest('/register', data)
+  return postRequestForService('/register', data)
 }
 export function get () {
   return service.get('/get')
